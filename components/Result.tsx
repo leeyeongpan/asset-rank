@@ -13,13 +13,13 @@ interface ResultProps {
   onReset: () => void;
 }
 
-const STAGE_COLORS: Record<number, { bg: string; text: string; bar: string }> = {
-  1: { bg: "bg-gray-100", text: "text-gray-700", bar: "bg-gray-400" },
-  2: { bg: "bg-blue-50", text: "text-blue-700", bar: "bg-blue-400" },
-  3: { bg: "bg-green-50", text: "text-green-700", bar: "bg-green-500" },
-  4: { bg: "bg-yellow-50", text: "text-yellow-700", bar: "bg-yellow-500" },
-  5: { bg: "bg-orange-50", text: "text-orange-700", bar: "bg-orange-500" },
-  6: { bg: "bg-purple-50", text: "text-purple-700", bar: "bg-purple-600" },
+const STAGE_COLORS: Record<number, { bg: string; text: string; bar: string; ring: string }> = {
+  1: { bg: "bg-gray-100", text: "text-gray-700", bar: "bg-gray-400", ring: "ring-gray-400" },
+  2: { bg: "bg-blue-50", text: "text-blue-700", bar: "bg-blue-400", ring: "ring-blue-400" },
+  3: { bg: "bg-green-50", text: "text-green-700", bar: "bg-green-500", ring: "ring-green-500" },
+  4: { bg: "bg-yellow-50", text: "text-yellow-700", bar: "bg-yellow-500", ring: "ring-yellow-500" },
+  5: { bg: "bg-orange-50", text: "text-orange-700", bar: "bg-orange-500", ring: "ring-orange-500" },
+  6: { bg: "bg-purple-50", text: "text-purple-700", bar: "bg-purple-600", ring: "ring-purple-600" },
 };
 
 export default function Result({
@@ -38,17 +38,21 @@ export default function Result({
   function handleShare() {
     const text = `나는 ${ageGroupLabel} 기준 자산 상위 ${topPercent}% — ${stage.level}단계 "${stage.name}" 구간입니다. 내 자산 단계는?`;
     const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({ text, url });
-    } else {
-      navigator.clipboard.writeText(`${text}\n${url}`);
-      alert("링크가 클립보드에 복사되었습니다.");
+    try {
+      if (navigator.share) {
+        navigator.share({ text, url });
+      } else {
+        navigator.clipboard.writeText(`${text}\n${url}`);
+        alert("링크가 클립보드에 복사되었습니다.");
+      }
+    } catch {
+      // share/clipboard not available (non-HTTPS or old browser)
     }
   }
 
   async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: wire to Resend/Supabase
+    // TODO: wire to Resend/Supabase — payload: { email, age, stage: stage.level, percentile, ageGroupLabel }
     setEmailSubmitted(true);
   }
 
@@ -82,7 +86,7 @@ export default function Result({
         {/* Progress bar */}
         <div className="mt-4">
           <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>하위 0%</span>
+            <span>하위 100%</span>
             <span>상위 0%</span>
           </div>
           <div className="h-3 bg-black/10 rounded-full overflow-hidden">
@@ -121,7 +125,7 @@ export default function Result({
               <div
                 key={lvl}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
-                  isCurrentStage ? `${c.bg} ring-2 ring-offset-1 ${c.bar.replace("bg-", "ring-")}` : ""
+                  isCurrentStage ? `${c.bg} ring-2 ring-offset-1 ${c.ring}` : ""
                 }`}
               >
                 <span className={`text-xs font-bold w-8 ${isCurrentStage ? colors.text : "text-gray-400"}`}>

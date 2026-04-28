@@ -105,9 +105,9 @@ export function calculatePercentile(age: number, netAsset: number): number {
   const data = AGE_GROUP_DATA[ageGroup];
   const points = data.percentilePoints;
 
-  // Below lowest point
+  // Below lowest point (including negative assets)
   if (netAsset <= points[0][1]) {
-    return Math.max(1, Math.round(points[0][0] * (netAsset / points[0][1])));
+    return 1;
   }
 
   // Above highest point

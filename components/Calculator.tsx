@@ -12,7 +12,7 @@ export default function Calculator() {
   const [submitted, setSubmitted] = useState(false);
 
   const netAsset = assetInput
-    ? parseFloat(assetInput) * (assetUnit === "억원" ? 100_000_000 : 10_000)
+    ? parseFloat(assetInput.replace(/[．]/g, ".")) * (assetUnit === "억원" ? 100_000_000 : 10_000)
     : 0;
 
   const ageNum = parseInt(age);
